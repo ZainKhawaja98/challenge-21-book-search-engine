@@ -2,25 +2,17 @@
 
 ## Description
 
-Provide a short description explaining the what, why, and how of your project. Use the following questions as a guide:
-
-- What was your motivation?
-- Why did you build this project? (Note: the answer is not "Because it was a homework assignment.")
-- What problem does it solve?
-- What did you learn?
-
+This application allows users to use a search engine to search books, view them, and save them which can be viewed later. This project uses the apollo server and MongoDB which allows transactions to be stored. 
 
 ## Installation
 
-What are the steps required to install your project? Provide a step-by-step description of how to get the development environment running.
+Clone the application and run npm install
 
 ## Usage
 
-Provide instructions and examples for use. Include screenshots as needed.
+Type in the name of a book in the search bar and save any book. Users can view the saved books in a separate page and delete saved books.
 
-To add a screenshot, create an `assets/images` folder in your repository and upload your screenshot to it. Then, using the relative file path, add it to your README using the following syntax:
-
-![alt text](assets/images/screenshot.png)
+![alt text](client/src/images/website.png)
 
 
 ## License
