@@ -1,28 +1,19 @@
 import React from 'react';
-import {
-  Jumbotron,
-  Container,
-  CardColumns,
-  Card,
-  Button,
-} from 'react-bootstrap';
+import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
+import Auth from "../utils/auth";
+import { removeBookId } from "../utils/localStorage";
 
-import Auth from '../utils/auth';
-import { removeBookId } from '../utils/localStorage';
-
-import { useQuery } from '@apollo/client';
-import { GET_ME } from '../utils/queries';
-
-import { useMutation } from '@apollo/client';
-import { REMOVE_BOOK } from '../utils/mutations';
+import { useQuery, useMutation } from "@apollo/client";
+import { QUERY_ME } from "../utils/queries";
+import { REMOVE_BOOK } from "../utils/mutations";
 
 const SavedBooks = () => {
-  const { loading, data } = useQuery(GET_ME);
+  const { loading, data } = useQuery(QUERY_ME);
+  const [removeBook] = useMutation(REMOVE_BOOK);
 
-  const [deleteBook, { error }] = useMutation(REMOVE_BOOK);
+  const userData = data?.me || [];
 
-  const userData = data?.me || {};
-
+  // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -31,22 +22,12 @@ const SavedBooks = () => {
     }
 
     try {
-      await deleteBook({
-        variables: { bookId },
+      await removeBook({
+        variables: { bookId: bookId },
       });
 
-      // Remove the book's id from the localStorage array
+      // upon success, remove book's id from localStorage
       removeBookId(bookId);
-      document.getElementById(bookId).remove();
-      let counterEl = document.getElementById('counter');
-      let currentNum = parseInt(counterEl.innerText.split(' ')[1]);
-      if (currentNum === 1) {
-        return (counterEl.innerText = 'There are no saved books');
-      } else {
-        counterEl.innerText = `Viewing ${currentNum - 1} saved ${
-          currentNum === 1 ? 'book' : 'books'
-        }`;
-      }
     } catch (err) {
       console.error(err);
     }
@@ -65,17 +46,16 @@ const SavedBooks = () => {
         </Container>
       </Jumbotron>
       <Container>
-        <h2 id="counter">
+        <h2>
           {userData.savedBooks.length
-            ? `Viewing ${userData.savedBooks.length} saved ${
-                userData.savedBooks.length === 1 ? 'book' : 'books'
-              }:`
-            : 'There are no saved books'}
+            ? `Viewing ${userData.savedBooks.length} saved ${userData.savedBooks.length === 1 ? "book" : "books"
+            }:`
+            : "You have no saved books!"}
         </h2>
         <CardColumns>
-          {userData.savedBooks.map((book, key) => {
+          {userData.savedBooks.map((book) => {
             return (
-              <Card key={key} id={book.bookId} border="dark">
+              <Card key={book.bookId} border="dark">
                 {book.image ? (
                   <Card.Img
                     src={book.image}
@@ -87,14 +67,6 @@ const SavedBooks = () => {
                   <Card.Title>{book.title}</Card.Title>
                   <p className="small">Authors: {book.authors}</p>
                   <Card.Text>{book.description}</Card.Text>
-                  <a
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    sid="link"
-                    href={book.link}
-                  >
-                    {book.link == null ? 'No link available' : 'Link to google'}
-                  </a>
                   <Button
                     className="btn-block btn-danger"
                     onClick={() => handleDeleteBook(book.bookId)}
@@ -106,7 +78,6 @@ const SavedBooks = () => {
             );
           })}
         </CardColumns>
-        {error && <div>Cannot view your books</div>}
       </Container>
     </>
   );
